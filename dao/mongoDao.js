@@ -4,12 +4,17 @@ var mongodb=require("mongodb");
 var MongoClient=mongodb.MongoClient;
 var ObjectID=mongodb.ObjectID;
 
-var dbUrl = "mongodb://localhost:27017/";
-var dbName="myDB1";
+var dbUrl = "mongodb://localhost:27017/";// 数据库url
+var dbName="myDB1";//库名
+
+//可选的连接选项 options
+var dbOption={
+    poolSize:5,//连接池大小缺省值为5
+};
 
 
 
- function _getRidOffNonAttr(obj) {
+function _getRidOffNonAttr(obj) {
     var o={};
     for(var x in obj){
         if(obj[x]){
@@ -21,29 +26,19 @@ var dbName="myDB1";
 
 
 
+var dbo;
 
-/**
- * 连接数据库(自动关闭数据库)
- * @param callback  回调函数中返回 dbo对象
- * @private
- */
-function  __connectDb(callback) {
-    MongoClient.connect(dbUrl,function (err,db) {
+(function () {
+    MongoClient.connect(dbUrl,dbOption,function (err,client) {
         if (err) {
             throw  err;
         }
-        try {
-            var dbo = db.db(dbName);
-            callback(dbo);
-        }finally{
-            db.close();
-        }
-            // var dbo = db.db(dbName);
-            // callback(dbo);
-            // db.close();
-    });
+      dbo=  client.db(dbName);
+        console.log("dbo对象：");
+        console.log(dbo);
 
-}
+    });
+})();
 
 /**
  * @param collectionName 集合名 表名
@@ -51,14 +46,14 @@ function  __connectDb(callback) {
  * @param callback 回调函数
  */
 function find(collectionName,whereClause,callback) {
-    __connectDb(function (dbo) {
 
-        dbo.collection(collectionName).find(whereClause).toArray(function(err, list) { // 返回集合中所有数据
-            if (err) throw err;
 
-            callback(list);//返回列表数据
-        });
+    dbo.collection(collectionName).find(whereClause).toArray(function(err, list) { // 返回集合中所有数据
+        if (err) throw err;
+
+        callback(list);//返回列表数据
     });
+
 }
 
 
@@ -69,14 +64,13 @@ function find(collectionName,whereClause,callback) {
  * @param callback  回调函数
  */
 function findById(collectionName,id,callback) {
-    __connectDb(function (dbo) {
 
-        dbo.collection(collectionName).find({'_id':ObjectID(id)}).toArray(function(err, list) { // 返回集合中所有数据
-            if (err) throw err;
+    dbo.collection(collectionName).find({'_id':ObjectID(id)}).toArray(function(err, list) { // 返回集合中所有数据
+        if (err) throw err;
 
-            callback(list[0]||undefined);//返回列表中唯一的一条数据
-        });
+        callback(list[0]||undefined);//返回列表中唯一的一条数据
     });
+
 }
 /**
  *
@@ -84,14 +78,14 @@ function findById(collectionName,id,callback) {
  * @param callback  回调函数
  */
 function findAll(collectionName,callback) {
-    __connectDb(function (dbo) {
 
-        dbo.collection(collectionName).find({}).sort({"createtime":-1}).toArray(function(err, list) { // 返回集合中所有数据
-            if (err) throw err;
 
-            callback(list);//返回列表数据
-        });
+    dbo.collection(collectionName).find({}).sort({"createtime":-1}).toArray(function(err, list) { // 返回集合中所有数据
+        if (err) throw err;
+
+        callback(list);//返回列表数据
     });
+
 }
 
 
@@ -103,16 +97,15 @@ function findAll(collectionName,callback) {
  * @param callback options可选的回调函数，返回实际受影响的行数 n
  */
 function insertOne(collectionName,insertObj,callback) {
-    __connectDb(function (dbo) {
-        dbo.collection(collectionName).insertOne(insertObj, function(err, result) {
+
+    dbo.collection(collectionName).insertOne(insertObj, function(err, result) {
         if (err) {
             throw  err;
         }
         if(callback){
-             console.log(result.result.n+" 条数据被插入");
+            console.log(result.result.n+" 条数据被插入");
             callback(result.result.n); //返回实际受影响的行数 n
         }
-      });
     });
 
 }
@@ -124,17 +117,17 @@ function insertOne(collectionName,insertObj,callback) {
  * @param callback  可选的回调函数， 可获得mongodb操作底层返回的result对象
  */
 function insertMany(collectionName,insertArray,callback) {
-    __connectDb(function (dbo) {
-        dbo.collection(collectionName).insertMany(insertArray, function(err, result) {
-            if (err) {
-                throw  err;
-            }
-            if(callback){
-                console.log(result.result.n+" 条数据被插入");
-                callback(result.result.n); //返回实际受影响的行数 n
-            }
-        });
+
+    dbo.collection(collectionName).insertMany(insertArray, function(err, result) {
+        if (err) {
+            throw  err;
+        }
+        if(callback){
+            console.log(result.result.n+" 条数据被插入");
+            callback(result.result.n); //返回实际受影响的行数 n
+        }
     });
+
 }
 
 /**
@@ -145,21 +138,21 @@ function insertMany(collectionName,insertArray,callback) {
  * @param callback  可选的回调函数，得到实际被修改的文档的条数
  */
 function updateOne(collectionName,whereClause,updateClause,callback) {
-    __connectDb(function (dbo) {
 
-        updateClause=_getRidOffNonAttr(updateClause);
 
-       // dbo.collection(collectionName).updateOne(whereClause, updateClause,function(err, result) {
-        dbo.collection(collectionName).updateOne(whereClause, {$set:updateClause},function(err, result) {
-            if (err) {
-                throw  err;
-            }
-            if(callback){
-                console.log(result.result.nModified+" 条数据被更新");
-                callback(result.result.nModified);//n条文档被更新  返回数字
-            }
-        });
+    updateClause=_getRidOffNonAttr(updateClause);
+
+    // dbo.collection(collectionName).updateOne(whereClause, updateClause,function(err, result) {
+    dbo.collection(collectionName).updateOne(whereClause, {$set:updateClause},function(err, result) {
+        if (err) {
+            throw  err;
+        }
+        if(callback){
+            console.log(result.result.nModified+" 条数据被更新");
+            callback(result.result.nModified);//n条文档被更新  返回数字
+        }
     });
+
 }
 
 /**
@@ -170,19 +163,19 @@ function updateOne(collectionName,whereClause,updateClause,callback) {
  * @param callback  选的回调函数，得到实际被修改的文档的条数
  */
 function updateById(collectionName,id,updateClause,callback) {
-    __connectDb(function (dbo) {
 
-      //  dbo.collection(collectionName).updateOne({'_id':ObjectID(id)}, updateClause,function(err, result) {
-        dbo.collection(collectionName).updateOne({'_id':ObjectID(id)}, {$set:updateClause},function(err, result) {
-            if (err) {
-                throw  err;
-            }
-            if(callback){
-                console.log(result.result.nModified+" 条数据被更新");
-                callback(result.result.nModified);//n条文档被更新  返回数字
-            }
-        });
+
+    //  dbo.collection(collectionName).updateOne({'_id':ObjectID(id)}, updateClause,function(err, result) {
+    dbo.collection(collectionName).updateOne({'_id':ObjectID(id)}, {$set:updateClause},function(err, result) {
+        if (err) {
+            throw  err;
+        }
+        if(callback){
+            console.log(result.result.nModified+" 条数据被更新");
+            callback(result.result.nModified);//n条文档被更新  返回数字
+        }
     });
+
 }
 
 
@@ -194,21 +187,21 @@ function updateById(collectionName,id,updateClause,callback) {
  * @param callback  可选的回调函数，得到实际被修改的文档的条数
  */
 function  updateMany(collectionName,whereClause,updateClause,callback) {
-    __connectDb(function (dbo) {
 
-        updateClause=_getRidOffNonAttr(updateClause);
 
-   //     dbo.collection(collectionName).updateMany(whereClause, updateClause,function(err, result) {
-        dbo.collection(collectionName).updateMany(whereClause, {$set:updateClause},function(err, result) {
-            if (err) {
-                throw  err;
-            }
-            if(callback){
-                console.log(result.result.nModified+" 条数据被更新");
-                callback(result.result.nModified);//n条文档被更新  返回数字
-            }
-        });
+    updateClause=_getRidOffNonAttr(updateClause);
+
+    //     dbo.collection(collectionName).updateMany(whereClause, updateClause,function(err, result) {
+    dbo.collection(collectionName).updateMany(whereClause, {$set:updateClause},function(err, result) {
+        if (err) {
+            throw  err;
+        }
+        if(callback){
+            console.log(result.result.nModified+" 条数据被更新");
+            callback(result.result.nModified);//n条文档被更新  返回数字
+        }
     });
+
 }
 
 /**
@@ -219,19 +212,19 @@ function  updateMany(collectionName,whereClause,updateClause,callback) {
  */
 function deleteOne(collectionName,whereClause,callback) {
 
-    __connectDb(function (dbo) {
 
-        dbo.collection(collectionName).deleteOne(whereClause,function(err, result) {
-            if (err) {
-                throw  err;
-            }
-            if(callback){
-                console.log(result.result.n+" 条数据被删除");
-                callback(result.result.n);//n条文档被删除  返回实际被删除的文档数量
 
-            }
-        });
+    dbo.collection(collectionName).deleteOne(whereClause,function(err, result) {
+        if (err) {
+            throw  err;
+        }
+        if(callback){
+            console.log(result.result.n+" 条数据被删除");
+            callback(result.result.n);//n条文档被删除  返回实际被删除的文档数量
+
+        }
     });
+
 }
 /**
  * 根据id删除 一条文档
@@ -241,18 +234,18 @@ function deleteOne(collectionName,whereClause,callback) {
  */
 function deleteById(collectionName,id,callback) {
 
-    __connectDb(function (dbo) {
 
-        dbo.collection(collectionName).deleteOne({'_id':ObjectID(id)},function(err, result) {
-            if (err) {
-                throw  err;
-            }
-            if(callback){
-                console.log(result.result.n+" 条数据被删除");
-                callback(result.result.n);//n条文档被删除  返回实际被删除的文档数量
-            }
-        });
+
+    dbo.collection(collectionName).deleteOne({'_id':ObjectID(id)},function(err, result) {
+        if (err) {
+            throw  err;
+        }
+        if(callback){
+            console.log(result.result.n+" 条数据被删除");
+            callback(result.result.n);//n条文档被删除  返回实际被删除的文档数量
+        }
     });
+
 }
 
 
@@ -264,19 +257,17 @@ function deleteById(collectionName,id,callback) {
  */
 function  deleteMany(collectionName,whereClause,callback) {
 
-    __connectDb(function (dbo) {
-
-        dbo.collection(collectionName).deleteMany(whereClause,function(err, result) {
-            if (err) {
-                throw  err;
-            }
-            if(callback){
-                console.log(result.result.n+" 条数据被删除");
-                callback(result.result.n);//n条文档被删除  返回实际被删除的文档数量
-                //   console.log(result.result.n + " 条文档被删除");//
-            }
-        });
+    dbo.collection(collectionName).deleteMany(whereClause,function(err, result) {
+        if (err) {
+            throw  err;
+        }
+        if(callback){
+            console.log(result.result.n+" 条数据被删除");
+            callback(result.result.n);//n条文档被删除  返回实际被删除的文档数量
+            //   console.log(result.result.n + " 条文档被删除");//
+        }
     });
+
 }
 
 

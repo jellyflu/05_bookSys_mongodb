@@ -7,10 +7,13 @@ var session = require("express-session");
 var bodyParser = require('body-parser');
 var multiparty = require('multiparty');
 
+//require('./dao/mongoDao.js');
 
 var bookService=require('./service/bookService.js');
 
 var app=express();
+
+
 
 
 //静态web站点
