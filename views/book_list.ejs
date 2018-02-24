@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图书首页-列表</title>
+    <style type="text/css">
+        #bookTable th, #bookTable td{
+            border: 1px solid  #2E2D3C;
+            collapse: collapse;
+        }
+
+    </style>
+</head>
+<body>
+ <% if(!bookList && bookList !=[]) {%>
+    <h3>书库中暂无任何图书，请您添加！</h3>
+ <% } else{%>
+    <table id="bookTable" style="border: 1px solid  #2E2D3C;">
+        <tr>
+            <td colspan="7" style="text-align: center">
+                <a href="/book_add">添加图书</a></td>
+        </tr>
+        <tr>
+           <th>图书名称</th>
+           <th>图书作者</th>
+           <th>图书描述</th>
+           <th>图书价格</th>
+           <th>封面图片</th>
+           <th>创建时间</th>
+           <th>操&nbsp;&nbsp;作</th>
+        </tr>
+        <% for(var i=0;i<bookList.length;i++){%>
+        <tr>
+          <td><%=bookList[i].bookName %></td>
+          <td><%=bookList[i].author %></td>
+          <td><%=bookList[i].description %></td>
+          <td><%=bookList[i].price %></td>
+          <td>
+              <%if(bookList[i].picUrl){%>
+                 <img src="<%=bookList[i].picUrl %>" width="150px" height="150px"/>
+              <%}else{%>
+                 暂无封面图片
+              <%}%>
+          </td>
+          <td><%=bookList[i].createtime %></td>
+
+            <td><a  href="/book_update/<%=bookList[i]._id %>">修改</a>
+                <a href="javascript:del('<%=bookList[i]._id %>')">删除</a>
+            </td>
+        </tr>
+        <%}%>
+    </table>
+
+ <%}%>
+</body>
+</html>
+<script src="/resources/jquery.min.js"></script>
+<script>
+    function del(_id) {
+        if(confirm('确定删除吗')){
+            $.ajax({
+                url:'/book_delete',
+                data:{
+                    _id:_id
+                },
+                type:'post',
+                dataType:'json',
+                success:function (data) {
+                    if(data.status==200){
+                       // alert(data.message);
+                        window.location.href='/book_list';
+                    }else{
+                        //失败
+                        alert(data.message);
+                    }
+                }
+            });
+        }
+
+    }
+    
+</script>

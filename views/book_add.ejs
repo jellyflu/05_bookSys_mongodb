@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图书添加</title>
+</head>
+<body>
+  <h3>图书添加</h3>
+  <div>
+
+      图书名称:<input type="text"  id="bookName"/> <br/>
+      图书作者:<input type="text" id="author"/> <br/>
+      图书描述:<input type="text" id="description"/> <br/>
+      图书价格:<input type="text"  id="price"/> <br/>
+      封面图片上传:<input type="file" id="pic" name="pic"/> <br/>
+      <button type="button" onclick="add()">确定</button>
+
+  </div>
+
+</body>
+</html>
+<script src="/resources/jquery.min.js"></script>
+<script>
+
+function add() {
+
+    var bookName=$.trim($("#bookName").val());
+    var author=$.trim($("#author").val());
+    var description=$.trim($("#description").val());
+    var price=$.trim($("#price").val());
+
+
+    var formData = new FormData();
+    formData.append("pic",document.getElementById("pic").files[0]);
+
+    formData.append("bookName",bookName);
+    formData.append("author",author);
+    formData.append("description",description);
+    formData.append("price",price);
+
+    $.ajax({
+        url : '/book_add',
+        type : 'post',
+        dataType:'json',
+        data : formData,
+        processData : false,
+        contentType : false,
+        success:function (data) {
+            if(data.status==200){
+                // alert(data.message);
+                //页面跳转
+                window.location.href='/book_list';
+            }else{
+                //失败
+                alert(data.message);
+            }
+        }
+    });
+}
+
+
+
+</script>

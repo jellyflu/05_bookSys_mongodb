@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图书修改</title>
+</head>
+<body>
+<h3>图书修改</h3>
+<div>
+    <input type="hidden" id="_id" value="<%=book._id%>"/>
+    图书名称:<input type="text"  id="bookName" value="<%=book.bookName%>"/> <br/>
+    图书作者:<input type="text"  id="author" value="<%=book.author%>"/> <br/>
+    图书描述:<input type="text"  id="description" value="<%=book.description%>"/> <br/>
+    图书价格:<input type="text"  id="price" value="<%=book.price%>"/> <br/>
+    <%if(book.picUrl){%>
+      封面图片: <br/>
+      <img src="<%=book.picUrl %>"  width="150px" height="150px"/> <br/>
+    <%}else{%>
+      暂无封面图片 <br/>
+    <%}%>
+    封面图片上传:<input type="file" id="pic" name="pic"/> <br/>
+
+    <button type="button" onclick="update()">确定</button>
+
+</div>
+
+</body>
+</html>
+<script src="/resources/jquery.min.js"></script>
+<script>
+
+    function update() {
+
+        var bookName=$.trim($("#bookName").val());
+        var author=$.trim($("#author").val());
+        var description=$.trim($("#description").val());
+        var price=$.trim($("#price").val());
+        var _id=$("#_id").val();
+
+        var formData = new FormData();
+        formData.append("pic",document.getElementById("pic").files[0]);
+
+        formData.append("bookName",bookName);
+        formData.append("author",author);
+        formData.append("description",description);
+        formData.append("price",price);
+        formData.append("_id",_id);
+
+
+    //     $.ajax({
+    //         url:'/book_update',
+    //         data:{
+    //             bookName:bookName,
+    //             author:author,
+    //             description:description,
+    //             price:price,
+    //             _id:_id,
+    //         },
+    //         type:'post',
+    //         dataTye:'json',
+    //         success:function (data) {
+    //             if(data.status==200){
+    //               //  alert(data.message);
+    //                 //页面跳转
+    //                 window.location.href='/book_list';
+    //             }else{
+    //                 //失败
+    //                 alert(data.message);
+    //             }
+    //         }
+    //     });
+    // }
+        $.ajax({
+            url : '/book_update',
+            type : 'post',
+            dataType:'json',
+            data : formData,
+            processData : false,
+            contentType : false,
+            success:function (data) {
+                if(data.status==200){
+                  // alert(data.message);
+                    //页面跳转
+                    window.location.href='/book_list';
+                }else{
+                    //失败
+                    alert(data.message);
+                }
+            }
+        });
+    }
+
+</script>
