@@ -41,6 +41,7 @@ var dbo;
 })();
 
 /**
+ * 查询
  * @param collectionName 集合名 表名
  * @param whereClause  条件字句 对象
  * @param callback 回调函数
@@ -58,7 +59,7 @@ function find(collectionName,whereClause,callback) {
 
 
 /**
- *
+ * 根据id查询
  * @param collectionName  集合名  表名
  * @param id   ObjectID
  * @param callback  回调函数
@@ -73,7 +74,7 @@ function findById(collectionName,id,callback) {
 
 }
 /**
- *
+ *查询所有
  * @param collectionName  集合名  表名
  * @param callback  回调函数
  */
@@ -91,7 +92,7 @@ function findAll(collectionName,callback) {
 
 
 /**
- *
+ * 插入一个文档
  * @param collectionName  集合名
  * @param insertObj   插入对象
  * @param callback options可选的回调函数，返回实际受影响的行数 n
@@ -111,7 +112,7 @@ function insertOne(collectionName,insertObj,callback) {
 }
 
 /**
- *
+ *插入多个文档
  * @param collection 集合名
  * @param insertArray  插入对象数组
  * @param callback  可选的回调函数， 可获得mongodb操作底层返回的result对象
@@ -131,7 +132,7 @@ function insertMany(collectionName,insertArray,callback) {
 }
 
 /**
- *
+ *更新一个文档
  * @param collectionName  集合名称
  * @param whereClause 条件字句对象
  * @param updateClause  一个update对象  $set
@@ -156,7 +157,7 @@ function updateOne(collectionName,whereClause,updateClause,callback) {
 }
 
 /**
- *
+ *根据id更新  文档
  * @param collectionName  集合名称
  * @param id  ObjectID
  * @param updateClause   一个update对象  $set
@@ -180,7 +181,7 @@ function updateById(collectionName,id,updateClause,callback) {
 
 
 /**
- *
+ *更新多个文档
  * @param collectionName  集合名称
  * @param whereClause 条件字句对象
  * @param updateClause update对象  {$set: { "url" : "https://www.runoob.com" }};
@@ -212,8 +213,6 @@ function  updateMany(collectionName,whereClause,updateClause,callback) {
  */
 function deleteOne(collectionName,whereClause,callback) {
 
-
-
     dbo.collection(collectionName).deleteOne(whereClause,function(err, result) {
         if (err) {
             throw  err;
@@ -233,8 +232,6 @@ function deleteOne(collectionName,whereClause,callback) {
  * @param callback
  */
 function deleteById(collectionName,id,callback) {
-
-
 
     dbo.collection(collectionName).deleteOne({'_id':ObjectID(id)},function(err, result) {
         if (err) {
