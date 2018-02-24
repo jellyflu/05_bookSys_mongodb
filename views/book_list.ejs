@@ -12,9 +12,7 @@
     </style>
 </head>
 <body>
- <% if(!bookList && bookList !=[]) {%>
-    <h3>书库中暂无任何图书，请您添加！</h3>
- <% } else{%>
+
     <table id="bookTable" style="border: 1px solid  #2E2D3C;">
         <tr>
             <td colspan="7" style="text-align: center">
@@ -48,7 +46,7 @@
                 <a href="javascript:del('<%=bookList[i]._id %>')">删除</a>
             </td>
         </tr>
-        <%}%>
+
     </table>
 
  <%}%>
