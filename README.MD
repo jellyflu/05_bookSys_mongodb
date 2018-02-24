@@ -12,3 +12,5 @@ views 视图页面,
 
 resources 静态资源目录
 
+![项目截图](https://github.com/jellyflu/05_bookSys_mongodb/about/a1.png)
+
