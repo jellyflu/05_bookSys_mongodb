@@ -17,7 +17,10 @@ var dbOption={
 function _getRidOffNonAttr(obj) {
     var o={};
     for(var x in obj){
-        if(obj[x]){
+        // if(obj[x]){
+        //     o[x]=obj[x];
+        // }
+        if(obj[x] !==null  && obj[x]!==undefined){
             o[x]=obj[x];
         }
     }
